@@ -33,7 +33,7 @@ while (true) {
 		perform_handshaking($header, $socket_new, $host, $port); //perform websocket handshake
 		
 		socket_getpeername($socket_new, $ip); //get ip address of connected socket
-		$response = mask(json_encode(array('type'=>'system', 'message'=>'SERVER: '.$ip.' connected'))); //prepare json data
+		$response = mask(json_encode(array('type'=>'systemConnection', 'message'=>'SERVER: '.$ip.' connected'))); //prepare json data
 		send_message($response); //notify all users about new connection
 		
 		//make room for new socket
@@ -52,22 +52,32 @@ while (true) {
 			$user_name = $tst_msg->name; //sender name
 			$user_message = $tst_msg->message; //message text
 			$user_color = $tst_msg->color; //color
+			$channel = $tst_msg->channel; //color
 			$usernames[substr((string)$changed_socket, -1)]['username'] = $user_name;
-			print_r($usernames);
+			$usernames[substr((string)$changed_socket, -1)]['channel'] = $channel;
 			//prepare data to be sent to client
 			$response_text = mask(json_encode(array('type'=>'usermsg', 'name'=>$user_name, 'message'=>$user_message, 'color'=>$user_color)));
 			$count = count($clients)-1;
-			if ($user_message == "/players"){
+			if ($user_message == "/allplayers")
+			{
 						$response = mask(json_encode(array('type'=>'system', 'message'=>'SERVER: '.$count.' users are connected:'.implode(',', array_map(function($usernames){ return $usernames['username']; }, $usernames)))));
 						@socket_write($changed_socket,$response,strlen($response));
 				break 2;
 			}
-			if ($user_message == "/whoami"){
+
+			if ($user_message == "/connection")
+			{
+				$response = mask(json_encode(array('type'=>'systemConnection', 'message'=>'SERVER: '.$user_name.' connected'))); //prepare json data
+				send_message($response,$channel);
+				break 2;
+			}
+			if ($user_message == "/whoami")
+			{
 				$response = mask(json_encode(array('type'=>'system', 'message'=>'SERVER:'.$user_name)));
 				@socket_write($changed_socket,$response,strlen($response));
 				break 2;
 			}
-			send_message($response_text); //send data
+			send_message($response_text,$channel); //send data
 			break 2; //exist this loop
 		}
 		
@@ -78,21 +88,26 @@ while (true) {
 			socket_getpeername($changed_socket, $ip);
 			unset($clients[$found_socket]);
 			//notify all users about disconnected connection
-			$response = mask(json_encode(array('type'=>'system', 'message'=>'SERVER: '.$usernames[substr((string)$changed_socket, -1)]['username'].' disconnected')));
+			$response = mask(json_encode(array('type'=>'systemConnection', 'message'=>'SERVER: '.$usernames[substr((string)$changed_socket, -1)]['username'].' disconnected')));
 			unset($usernames[$changed_socket]);
-			send_message($response);
+			send_message($response,$channel);
 		}
 	}
 }
 // close the listening socket
 socket_close($sock);
 
-function send_message($msg)
+function send_message($msg,$channel='Main')
 {
 	global $clients;
+	global $usernames;
 	foreach($clients as $changed_socket)
-	{
-		@socket_write($changed_socket,$msg,strlen($msg));
+	{	
+		$channel1 = $usernames[substr((string)$changed_socket, -1)]['channel'];
+		if ($channel == $channel1){
+			@socket_write($changed_socket,$msg,strlen($msg));
+		}
+		
 	}
 	return true;
 }
