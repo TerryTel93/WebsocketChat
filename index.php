@@ -30,7 +30,6 @@
 </style>
 </head>
 <script type="text/javascript" src="js/jquery.js"></script>
-<script type="text/javascript" src="js/jquery.emotions.js"></script>
 <script type="text/javascript" src="mespeak.js"></script>
 
 <body>	
@@ -79,7 +78,7 @@ $(document).ready(function(){
 
 		if(type == 'usermsg') 
 		{
-			$('#message_box').append("<div><span class=\"user_name\" style=\"color:#"+ucolor+"\">"+uname+"</span> : <span class=\"user_message\">"+umsg+"</span></div>").emotions();
+			$('#message_box').append("<div><span class=\"user_name\" style=\"color:#"+ucolor+"\">"+uname+"</span> : <span class=\"user_message\">"+umsg+"</span></div>")
 			if (uname != '<?php echo $_GET["un"]; ?>')
   			{
   				$('#chatAudio')[0].play();
@@ -91,7 +90,7 @@ $(document).ready(function(){
 		}
 		if(type == 'system')
 		{
-			$('#message_box').append("<div class=\"system_msg\"><i>"+umsg+"</i></div>").emotions();
+			$('#message_box').append("<div class=\"system_msg\"><i>"+umsg+"</i></div>")
   				$('#serverAudio')[0].play();
   				if ($('.myCheckbox').attr('checked','checked')){
   					meSpeak.speak(umsg)

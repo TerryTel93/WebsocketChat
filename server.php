@@ -17,8 +17,40 @@ socket_listen($socket);
 //create & add listning socket to the list
 $clients = array($socket);
 $usernames = array();
-$usernames['localhost']['username'] = "Server";
 //start endless loop, so that our script doesn't stop
+      function emoticons($text) {
+           $icons = array(
+						  ':)'    =>  '<img src="emotions-fb/smile.gif" class="emo1"/>',
+                          'O:)'   =>  '<img src="emotions-fb/angel.gif" class="emo1"/>',
+						  ':3'    =>  '<img src="emotions-fb/colonthree.gif" class="emo1"/>',
+                          'o.0'   =>  '<img src="emotions-fb/confused.gif" class="emo1"/>',
+						  'o.O'   =>  '<img src="emotions-fb/confused.gif" class="emo1"/>',
+						  ":')"   =>  '<img src="emotions-fb/cry.gif" class="emo1"/>',
+						  "3:)"   =>  '<img src="emotions-fb/devil.gif" class="emo1"/>',
+						  ":("    =>  '<img src="emotions-fb/frown.gif" class="emo1"/>',
+						  '8)'    =>  '<img src="emotions-fb/glasses.gif" class="emo1"/>',
+                          ':D'    =>  '<img src="emotions-fb/grin.gif" class="emo1"/>',
+						  '>:('   =>  '<img src="emotions-fb/grumpy.gif" class="emo1"/>',
+                          '<3'    =>  '<img src="emotions-fb/heart.gif" class="emo1"/>',
+						  'kiki'  =>  '<img src="emotions-fb/^_^.gif" class="emo1"/>',
+						  ":*"    =>  '<img src="emotions-fb/kiss.gif" class="emo1"/>',
+						  ":v"    =>  '<img src="emotions-fb/pacman.gif" class="emo1"/>',
+						  ":("    =>  '<img src="emotions-fb/frown.gif" class="emo1"/>',
+						  '-_-'    =>  '<img src="emotions-fb/squint.gif" class="emo1"/>',
+						  '8|'   =>  '<img src="emotions-fb/sunglasses.gif" class="emo1"/>',
+                          ':p'    =>  '<img src="emotions-fb/tongue.gif" class="emo1"/>',
+						  ':P'  =>  '<img src="emotions-fb/tongue.gif" class="emo1"/>',
+						  ":/"    =>  '<img src="emotions-fb/unsure.gif" class="emo1"/>',
+						  ">:O"    =>  '<img src="emotions-fb/upset.gif" class="emo1"/>',
+						  ";)"    =>  '<img src="emotions-fb/wink.gif" class="emo1"/>',
+						  ); 
+            $text = " ".$text." ";       
+            foreach ($icons as $search => $replace){
+             $text = str_replace(" ".$search." ", " ".$replace." ", $text);
+            }
+			echo $text;
+           return trim($text);
+      }
 while (true) {
 	//manage multipal connections
 	$changed = $clients;
@@ -53,21 +85,15 @@ while (true) {
 			$user_name = $tst_msg->name; //sender name
 			$user_message = $tst_msg->message; //message text
 			$user_color = $tst_msg->color; //color
-			$usernames[$changed_socket]['username'] = $user_name;
+			$usernames[substr((string)$changed_socket, -1)]['username'] = $user_name;
+			print_r($usernames);
 			//prepare data to be sent to client
+			$user_message = emoticons($user_message);
 			$response_text = mask(json_encode(array('type'=>'usermsg', 'name'=>$user_name, 'message'=>$user_message, 'color'=>$user_color)));
+			$count = count($clients)-1;
 			if ($user_message == "/players"){
-				$count = count($usernames);
-				
-
-
-
-						$response = mask(json_encode(array('type'=>'system', 'message'=>'SERVER: '.$count.' users are connected'. $v2)));
-						@socket_write($changed_socket,$response,strlen($response.$v2));
-				
-
-				
-				
+						$response = mask(json_encode(array('type'=>'system', 'message'=>'SERVER: '.$count.' users are connected:'.implode(',', array_map(function($usernames){ return $usernames['username']; }, $usernames)))));
+						@socket_write($changed_socket,$response,strlen($response));
 				break 2;
 			}
 			if ($user_message == "/whoami"){
@@ -75,7 +101,9 @@ while (true) {
 				@socket_write($changed_socket,$response,strlen($response));
 				break 2;
 			}
-			echo "\n";
+			
+			
+
 			send_message($response_text); //send data
 			break 2; //exist this loop
 		}
@@ -86,9 +114,9 @@ while (true) {
 			$found_socket = array_search($changed_socket, $clients);
 			socket_getpeername($changed_socket, $ip);
 			unset($clients[$found_socket]);
-			
 			//notify all users about disconnected connection
-			$response = mask(json_encode(array('type'=>'system', 'message'=>'<i>SERVER:</i> '.$ip.' disconnected')));
+			$response = mask(json_encode(array('type'=>'system', 'message'=>'SERVER: '.$usernames[substr((string)$changed_socket, -1)]['username'].' disconnected')));
+			unset($usernames[$changed_socket]);
 			send_message($response);
 		}
 	}
@@ -105,7 +133,6 @@ function send_message($msg)
 	}
 	return true;
 }
-
 
 //Unmask incoming framed message
 function unmask($text) {
