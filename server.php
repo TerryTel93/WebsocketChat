@@ -36,9 +36,18 @@ foreach($w as $s)
 }
 return $t;
 }
-
-
-
+function youtube($url) {
+preg_match(
+        '/[\\?\\&]v=([^\\?\\&]+)/',
+        $url,
+        $matches
+    );
+$id = $matches[1];
+ 
+$width = '640';
+$height = '385';
+return '<object width="' . $width . '" height="' . $height . '"><param name="movie" value="http://www.youtube.com/v/' . $id . '&amp;hl=en_US&amp;fs=1?rel=0"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/' . $id . '&amp;hl=en_US&amp;fs=1?rel=0" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="' . $width . '" height="' . $height . '"></embed></object>';
+}
 
 
 
@@ -114,6 +123,7 @@ while (true) {
 			//prepare data to be sent to client
 			$user_message = emoticons($user_message);
 			$user_message = url($user_message);
+			$user_message = youtube($user_message);
 			$response_text = mask(json_encode(array('type'=>'usermsg', 'name'=>$user_name, 'message'=>$user_message, 'color'=>$user_color)));
 			$count = count($clients)-1;
 			if ($user_message == "/players"){
