@@ -42,7 +42,7 @@ $user_colour = array_rand($colours);
 $(document).ready(function(){
 	$('<audio id="chatAudio"><source src="sounds-949-you-wouldnt-believe.mp3" type="audio/mpeg"></audio><audio id="serverAudio"><source src="sounds-917-communication-channel.mp3" type="audio/mpeg"></audio>').appendTo('body');
 	//create a new WebSocket object.
-	var wsUri = "ws://" + window.location.host + ":8080";
+	var wsUri = "ws://" + window.location.host + ":9000";
 	websocket = new WebSocket(wsUri); 
 	
 	websocket.onopen = function(ev) { // connection is open 
