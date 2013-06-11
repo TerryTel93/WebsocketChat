@@ -17,7 +17,6 @@ socket_listen($socket);
 //create & add listning socket to the list
 $clients = array($socket);
 $usernames = array();
-$usernames['localhost']['username'] = "Server";
 //start endless loop, so that our script doesn't stop
 while (true) {
 	//manage multipal connections
@@ -48,26 +47,21 @@ while (true) {
 		//check for any incomming data
 		while(socket_recv($changed_socket, $buf, 1024, 0) >= 1)
 		{
+			echo 'Connection:'.$changed_socket;
 			$received_text = unmask($buf); //unmask data
 			$tst_msg = json_decode($received_text); //json decode 
 			$user_name = $tst_msg->name; //sender name
 			$user_message = $tst_msg->message; //message text
 			$user_color = $tst_msg->color; //color
-			$usernames[$changed_socket]['username'] = $user_name;
+			$usernames[substr((string)$changed_socket, -1)]['username'] = $user_name;
+			print_r($usernames);
+			echo substr((string)$changed_socket, -1);
 			//prepare data to be sent to client
 			$response_text = mask(json_encode(array('type'=>'usermsg', 'name'=>$user_name, 'message'=>$user_message, 'color'=>$user_color)));
+			$count = count($clients)-1;
 			if ($user_message == "/players"){
-				$count = count($usernames);
-				
-
-
-
-						$response = mask(json_encode(array('type'=>'system', 'message'=>'SERVER: '.$count.' users are connected'. $v2)));
-						@socket_write($changed_socket,$response,strlen($response.$v2));
-				
-
-				
-				
+						$response = mask(json_encode(array('type'=>'system', 'message'=>'SERVER: '.$count.' users are connected:'.implode(',', array_map(function($usernames){ return $usernames['username']; }, $usernames)))));
+						@socket_write($changed_socket,$response,strlen($response));
 				break 2;
 			}
 			if ($user_message == "/whoami"){
@@ -86,9 +80,11 @@ while (true) {
 			$found_socket = array_search($changed_socket, $clients);
 			socket_getpeername($changed_socket, $ip);
 			unset($clients[$found_socket]);
-			
+			echo 'disconnected:'.$changed_socket;
+			echo $changed_socket;
 			//notify all users about disconnected connection
-			$response = mask(json_encode(array('type'=>'system', 'message'=>'<i>SERVER:</i> '.$ip.' disconnected')));
+			$response = mask(json_encode(array('type'=>'system', 'message'=>'SERVER: '.$usernames[substr((string)$changed_socket, -1)]['username'].' disconnected')));
+			unset($usernames[$changed_socket]);
 			send_message($response);
 		}
 	}
@@ -105,7 +101,6 @@ function send_message($msg)
 	}
 	return true;
 }
-
 
 //Unmask incoming framed message
 function unmask($text) {
