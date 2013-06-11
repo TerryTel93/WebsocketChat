@@ -100,10 +100,7 @@ while (true) {
 				$response = mask(json_encode(array('type'=>'system', 'message'=>'SERVER:'.$user_name)));
 				@socket_write($changed_socket,$response,strlen($response));
 				break 2;
-			}
-			
-			
-
+			}		
 			send_message($response_text); //send data
 			break 2; //exist this loop
 		}
