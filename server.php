@@ -18,6 +18,30 @@ socket_listen($socket);
 $clients = array($socket);
 $usernames = array();
 //start endless loop, so that our script doesn't stop
+
+
+function url($str) {
+$p = '^(http(s)?|ftp)://([a-z0-9_-]+.)+([a-z]{2,}){1}((:|/)(.*))?$';
+$w = explode(" ", $str); 
+foreach($w as $s)
+{
+    if(eregi($p, $s)) 
+    {
+        $t .= '<a href="'.$s.'" target="newTab">'.$s.'</a> '; 
+    }
+    else
+    {
+        $t .= $s.' ';
+    }
+}
+return $t;
+}
+
+
+
+
+
+
       function emoticons($text) {
            $icons = array(
 						  ':)'    =>  '<img src="emotions-fb/smile.gif" class="emo1"/>',
@@ -89,6 +113,7 @@ while (true) {
 			print_r($usernames);
 			//prepare data to be sent to client
 			$user_message = emoticons($user_message);
+			$user_message = url($user_message);
 			$response_text = mask(json_encode(array('type'=>'usermsg', 'name'=>$user_name, 'message'=>$user_message, 'color'=>$user_color)));
 			$count = count($clients)-1;
 			if ($user_message == "/players"){
