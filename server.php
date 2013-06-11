@@ -47,7 +47,6 @@ while (true) {
 		//check for any incomming data
 		while(socket_recv($changed_socket, $buf, 1024, 0) >= 1)
 		{
-			echo 'Connection:'.$changed_socket;
 			$received_text = unmask($buf); //unmask data
 			$tst_msg = json_decode($received_text); //json decode 
 			$user_name = $tst_msg->name; //sender name
@@ -55,7 +54,6 @@ while (true) {
 			$user_color = $tst_msg->color; //color
 			$usernames[substr((string)$changed_socket, -1)]['username'] = $user_name;
 			print_r($usernames);
-			echo substr((string)$changed_socket, -1);
 			//prepare data to be sent to client
 			$response_text = mask(json_encode(array('type'=>'usermsg', 'name'=>$user_name, 'message'=>$user_message, 'color'=>$user_color)));
 			$count = count($clients)-1;
@@ -69,7 +67,6 @@ while (true) {
 				@socket_write($changed_socket,$response,strlen($response));
 				break 2;
 			}
-			echo "\n";
 			send_message($response_text); //send data
 			break 2; //exist this loop
 		}
@@ -80,8 +77,6 @@ while (true) {
 			$found_socket = array_search($changed_socket, $clients);
 			socket_getpeername($changed_socket, $ip);
 			unset($clients[$found_socket]);
-			echo 'disconnected:'.$changed_socket;
-			echo $changed_socket;
 			//notify all users about disconnected connection
 			$response = mask(json_encode(array('type'=>'system', 'message'=>'SERVER: '.$usernames[substr((string)$changed_socket, -1)]['username'].' disconnected')));
 			unset($usernames[$changed_socket]);
