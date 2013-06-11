@@ -43,11 +43,19 @@ $user_colour = array_rand($colours);
 $(document).ready(function(){
 	$('<audio id="chatAudio"><source src="sounds-949-you-wouldnt-believe.mp3" type="audio/mpeg"></audio><audio id="serverAudio"><source src="sounds-917-communication-channel.mp3" type="audio/mpeg"></audio>').appendTo('body');
 	//create a new WebSocket object.
-	var wsUri = "ws://" + window.location.host + ":9000";
+	var wsUri = "ws://" + window.location.host + ":8080";
 	websocket = new WebSocket(wsUri); 
 	
 	websocket.onopen = function(ev) { // connection is open 
 		$('#message_box').append("<div class=\"system_msg\">Connected!</div>"); //notify user
+			var msg = {
+	message: "/connection",
+	name: '<?php echo $_GET["un"]; ?>',
+	color : '<?php echo $colours[$user_colour]; ?>',
+	channel : '<?php echo $_GET["channel"]; ?>'
+	};
+	//convert and send data to server
+	websocket.send(JSON.stringify(msg));
 	}
 
 	$('#send-btn').click(function(){ //use clicks message send button	
@@ -63,7 +71,8 @@ $(document).ready(function(){
 		var msg = {
 		message: mymessage,
 		name: '<?php echo $_GET["un"]; ?>',
-		color : '<?php echo $colours[$user_colour]; ?>'
+		color : '<?php echo $colours[$user_colour]; ?>',
+		channel : '<?php echo $_GET["channel"]; ?>'
 		};
 		//convert and send data to server
 		websocket.send(JSON.stringify(msg));
@@ -76,6 +85,7 @@ $(document).ready(function(){
 		var umsg = msg.message; //message text
 		var uname = msg.name; //user name
 		var ucolor = msg.color; //color
+		var channel = msg.channel; //channel name
 
 		if(type == 'usermsg') 
 		{
@@ -97,7 +107,15 @@ $(document).ready(function(){
   					meSpeak.speak(umsg)
   				}
 		}
-		if (uname == '<?php echo $_GET["un"]; ?>')
+		if(type == 'systemConnection')
+		{
+			$('#message_box').append("<div class=\"system_msg\"><i>"+umsg+"</i></div>")
+			if ($('.myCheckbox').attr('checked','checked')){
+  				meSpeak.speak(umsg)
+  			}
+		}
+
+		if (uname == '<?php echo $_GET["un"]; ?>' || type != 'systemConnection')
   			{
 		$('#message').val(''); //reset text
 		}
