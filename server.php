@@ -224,7 +224,7 @@ return '<object width="' . $width . '" height="' . $height . '"><param name="mov
 function emoticons($text) {
 $remove = array('http://','https://');
 $remove1 = array('', '', '', '');
-$arrFrom = array(':)', 'O:)', ':3', 'o.0', 'o.O', ":')", '3:)', ':(', '8)', ':D', '>:(', '<3', 'kiki', ':*', ':v', '-_-', '8|',':p', ':P', ':/', '>:O', ';)');
+$arrFrom = array(':)', 'O:)', ':3', 'o.0', 'o.O', ":')", '3:)', ':(', '8)', ':D', '>:(', '<3', '^_^', ':*', ':v', '-_-', '8|',':p', ':P', ':/', '>:O', ';)');
 $arrTo = array(
 			  '<img src="emotions-fb/smile.gif" class="emo1"/>',
 	          '<img src="emotions-fb/angel.gif" class="emo1"/>',
@@ -238,7 +238,7 @@ $arrTo = array(
 	          '<img src="emotions-fb/grin.gif" class="emo1"/>',
 			  '<img src="emotions-fb/grumpy.gif" class="emo1"/>',
 	          '<img src="emotions-fb/heart.gif" class="emo1"/>',
-			  '<img src="emotions-fb/^_^.gif" class="emo1"/>',
+			  '<img src="emotions-fb/kiki.gif" class="emo1"/>',
 			  '<img src="emotions-fb/kiss.gif" class="emo1"/>',
 			  '<img src="emotions-fb/pacman.gif" class="emo1"/>',
 			  '<img src="emotions-fb/squint.gif" class="emo1"/>',
