@@ -59,6 +59,7 @@ while (true) {
 			$user_message = url($user_message);
 			$response_text = mask(json_encode(array('type'=>'usermsg', 'name'=>$user_name, 'message'=>$user_message, 'color'=>$user_color)));
 			$count = count($clients)-1;
+			
 			if ($user_message == "/allplayers")
 			{
 				$response = mask(json_encode(array('type'=>'system', 'message'=>'SERVER: '.$count.' users are connected:'.implode(',', array_map(function($usernames){ return $usernames['username'].": ".$usernames['channel']; }, $usernames)))));
@@ -68,7 +69,7 @@ while (true) {
 
 			if ($user_message == "/connection")
 			{
-				$response = mask(json_encode(array('type'=>'systemConnection', 'message'=>'SERVER: '.$user_name.' connected'))); //prepare json data
+				$response = mask(json_encode(array('type'=>'systemConnection', 'message'=>'SERVER: '.$user_name.' Connected To Channel '.$channel.''))); //prepare json data
 				send_message($response,$channel);
 				break 2;
 			}
@@ -78,6 +79,14 @@ while (true) {
 				@socket_write($changed_socket,$response,strlen($response));
 				break 2;
 			}
+
+			if (substr($user_message, 0, 1) === '/') 
+			{
+   			 	$response = mask(json_encode(array('type'=>'system', 'message'=>'SERVER: Command Not Fount')));
+				@socket_write($changed_socket,$response,strlen($response));
+				break 2;
+			}
+
 			send_message($response_text,$channel); //send data
 			break 2; //exist this loop
 		}
