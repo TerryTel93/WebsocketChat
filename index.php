@@ -30,7 +30,6 @@
 </style>
 </head>
 <script type="text/javascript" src="js/jquery.js"></script>
-<script type="text/javascript" src="js/jquery.emotions.js"></script>
 <script type="text/javascript" src="mespeak.js"></script>
 
 <body>	
@@ -43,7 +42,7 @@ $user_colour = array_rand($colours);
 $(document).ready(function(){
 	$('<audio id="chatAudio"><source src="sounds-949-you-wouldnt-believe.mp3" type="audio/mpeg"></audio><audio id="serverAudio"><source src="sounds-917-communication-channel.mp3" type="audio/mpeg"></audio>').appendTo('body');
 	//create a new WebSocket object.
-	var wsUri = "ws://" + window.location.host + ":8080";
+	var wsUri = "ws://" + window.location.host + ":9000";
 	websocket = new WebSocket(wsUri); 
 	
 	websocket.onopen = function(ev) { // connection is open 
@@ -89,7 +88,7 @@ $(document).ready(function(){
 
 		if(type == 'usermsg') 
 		{
-			$('#message_box').append("<div><span class=\"user_name\" style=\"color:#"+ucolor+"\">"+uname+"</span> : <span class=\"user_message\">"+umsg+"</span></div>").emotions();
+			$('#message_box').append("<div><span class=\"user_name\" style=\"color:#"+ucolor+"\">"+uname+"</span> : <span class=\"user_message\">"+umsg+"</span></div>")
 			if (uname != '<?php echo $_GET["un"]; ?>')
   			{
   				$('#chatAudio')[0].play();
@@ -101,7 +100,7 @@ $(document).ready(function(){
 		}
 		if(type == 'system')
 		{
-			$('#message_box').append("<div class=\"system_msg\"><i>"+umsg+"</i></div>").emotions();
+			$('#message_box').append("<div class=\"system_msg\"><i>"+umsg+"</i></div>")
   				$('#serverAudio')[0].play();
   				if ($('.myCheckbox').attr('checked','checked')){
   					meSpeak.speak(umsg)
