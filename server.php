@@ -18,6 +18,71 @@ socket_listen($socket);
 $clients = array($socket);
 $usernames = array();
 //start endless loop, so that our script doesn't stop
+
+
+function url($str) {
+$p = '^(http(s)?|ftp)://([a-z0-9_-]+.)+([a-z]{2,}){1}((:|/)(.*))?$';
+$w = explode(" ", $str); 
+foreach($w as $s)
+{
+    if(eregi($p, $s)) 
+    {
+        $t .= '<a href="'.$s.'" target="newTab">'.$s.'</a> '; 
+    }
+    else
+    {
+        $t .= $s.' ';
+    }
+
+	}
+return $t;
+}
+function youtube($url) {
+preg_match(
+        '/[\\?\\&]v=([^\\?\\&]+)/',
+        $url,
+        $matches
+    );
+$id = $matches[1];
+ 
+$width = '640';
+$height = '385';
+return '<object width="' . $width . '" height="' . $height . '"><param name="movie" value="http://www.youtube.com/v/' . $id . '&amp;hl=en_US&amp;fs=1?rel=0"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/' . $id . '&amp;hl=en_US&amp;fs=1?rel=0" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="' . $width . '" height="' . $height . '"></embed></object>';
+}
+
+      function emoticons($text) {
+           $icons = array(
+						  ':)'    =>  '<img src="emotions-fb/smile.gif" class="emo1"/>',
+                          'O:)'   =>  '<img src="emotions-fb/angel.gif" class="emo1"/>',
+						  ':3'    =>  '<img src="emotions-fb/colonthree.gif" class="emo1"/>',
+                          'o.0'   =>  '<img src="emotions-fb/confused.gif" class="emo1"/>',
+						  'o.O'   =>  '<img src="emotions-fb/confused.gif" class="emo1"/>',
+						  ":')"   =>  '<img src="emotions-fb/cry.gif" class="emo1"/>',
+						  "3:)"   =>  '<img src="emotions-fb/devil.gif" class="emo1"/>',
+						  ":("    =>  '<img src="emotions-fb/frown.gif" class="emo1"/>',
+						  '8)'    =>  '<img src="emotions-fb/glasses.gif" class="emo1"/>',
+                          ':D'    =>  '<img src="emotions-fb/grin.gif" class="emo1"/>',
+						  '>:('   =>  '<img src="emotions-fb/grumpy.gif" class="emo1"/>',
+                          '<3'    =>  '<img src="emotions-fb/heart.gif" class="emo1"/>',
+						  'kiki'  =>  '<img src="emotions-fb/^_^.gif" class="emo1"/>',
+						  ":*"    =>  '<img src="emotions-fb/kiss.gif" class="emo1"/>',
+						  ":v"    =>  '<img src="emotions-fb/pacman.gif" class="emo1"/>',
+						  ":("    =>  '<img src="emotions-fb/frown.gif" class="emo1"/>',
+						  '-_-'    =>  '<img src="emotions-fb/squint.gif" class="emo1"/>',
+						  '8|'   =>  '<img src="emotions-fb/sunglasses.gif" class="emo1"/>',
+                          ':p'    =>  '<img src="emotions-fb/tongue.gif" class="emo1"/>',
+						  ':P'  =>  '<img src="emotions-fb/tongue.gif" class="emo1"/>',
+						  ":/"    =>  '<img src="emotions-fb/unsure.gif" class="emo1"/>',
+						  ">:O"    =>  '<img src="emotions-fb/upset.gif" class="emo1"/>',
+						  ";)"    =>  '<img src="emotions-fb/wink.gif" class="emo1"/>',
+						  ); 
+            $text = " ".$text." ";       
+            foreach ($icons as $search => $replace){
+             $text = str_replace(" ".$search." ", " ".$replace." ", $text);
+            }
+			echo $text;
+           return trim($text);
+      }
 while (true) {
 	//manage multipal connections
 	$changed = $clients;
@@ -55,6 +120,9 @@ while (true) {
 			$usernames[substr((string)$changed_socket, -1)]['username'] = $user_name;
 			print_r($usernames);
 			//prepare data to be sent to client
+			$user_message = emoticons($user_message);
+			$user_message = url($user_message);
+			//$user_message = youtube($user_message); -i brock it
 			$response_text = mask(json_encode(array('type'=>'usermsg', 'name'=>$user_name, 'message'=>$user_message, 'color'=>$user_color)));
 			$count = count($clients)-1;
 			if ($user_message == "/players"){
@@ -66,7 +134,11 @@ while (true) {
 				$response = mask(json_encode(array('type'=>'system', 'message'=>'SERVER:'.$user_name)));
 				@socket_write($changed_socket,$response,strlen($response));
 				break 2;
+<<<<<<< HEAD
 			}
+=======
+			}		
+>>>>>>> origin/GUI
 			send_message($response_text); //send data
 			break 2; //exist this loop
 		}
