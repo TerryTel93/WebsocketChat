@@ -55,7 +55,7 @@ while (true) {
 			$usernames[substr((string)$changed_socket, -1)]['channel'] = $channel;
 			//prepare data to be sent to client
 			
-			//$user_message = emoticons($user_message);
+			$user_message = emoticons($user_message);
 			$user_message = url($user_message);
 			$response_text = mask(json_encode(array('type'=>'usermsg', 'name'=>$user_name, 'message'=>$user_message, 'color'=>$user_color)));
 			$count = count($clients)-1;
@@ -221,7 +221,9 @@ $height = '385';
 return '<object width="' . $width . '" height="' . $height . '"><param name="movie" value="http://www.youtube.com/v/' . $id . '&amp;hl=en_US&amp;fs=1?rel=0"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/' . $id . '&amp;hl=en_US&amp;fs=1?rel=0" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="' . $width . '" height="' . $height . '"></embed></object>';
 }
 
-function emoticons($text) { 
+function emoticons($text) {
+$remove = array('http://','https://');
+$remove1 = array('', '', '', '');
 $arrFrom = array(':)', 'O:)', ':3', 'o.0', 'o.O', ":')", '3:)', ':(', '8)', ':D', '>:(', '<3', 'kiki', ':*', ':v', '-_-', '8|',':p', ':P', ':/', '>:O', ';)');
 $arrTo = array(
 			  '<img src="emotions-fb/smile.gif" class="emo1"/>',
@@ -247,5 +249,6 @@ $arrTo = array(
 			  '<img src="emotions-fb/upset.gif" class="emo1"/>',
 			  '<img src="emotions-fb/wink.gif" class="emo1"/>',
 			  );
+$text = str_replace($remove, $remove1, $text);
 return str_replace($arrFrom, $arrTo, $text);
 }
