@@ -30,7 +30,6 @@
 </style>
 </head>
 <script type="text/javascript" src="js/jquery.js"></script>
-<script type="text/javascript" src="js/jquery.emotions.js"></script>
 <script type="text/javascript" src="mespeak.js"></script>
 
 <body>	
@@ -48,6 +47,14 @@ $(document).ready(function(){
 	
 	websocket.onopen = function(ev) { // connection is open 
 		$('#message_box').append("<div class=\"system_msg\">Connected!</div>"); //notify user
+			var msg = {
+	message: "/connection",
+	name: '<?php echo $_GET["un"]; ?>',
+	color : '<?php echo $colours[$user_colour]; ?>',
+	channel : '<?php echo $_GET["channel"]; ?>'
+	};
+	//convert and send data to server
+	websocket.send(JSON.stringify(msg));
 	}
 
 	$('#send-btn').click(function(){ //use clicks message send button	
@@ -63,7 +70,8 @@ $(document).ready(function(){
 		var msg = {
 		message: mymessage,
 		name: '<?php echo $_GET["un"]; ?>',
-		color : '<?php echo $colours[$user_colour]; ?>'
+		color : '<?php echo $colours[$user_colour]; ?>',
+		channel : '<?php echo $_GET["channel"]; ?>'
 		};
 		//convert and send data to server
 		websocket.send(JSON.stringify(msg));
@@ -76,10 +84,11 @@ $(document).ready(function(){
 		var umsg = msg.message; //message text
 		var uname = msg.name; //user name
 		var ucolor = msg.color; //color
+		var channel = msg.channel; //channel name
 
 		if(type == 'usermsg') 
 		{
-			$('#message_box').append("<div><span class=\"user_name\" style=\"color:#"+ucolor+"\">"+uname+"</span> : <span class=\"user_message\">"+umsg+"</span></div>").emotions();
+			$('#message_box').append("<div><span class=\"user_name\" style=\"color:#"+ucolor+"\">"+uname+"</span> : <span class=\"user_message\">"+umsg+"</span></div>")
 			if (uname != '<?php echo $_GET["un"]; ?>')
   			{
   				$('#chatAudio')[0].play();
@@ -91,13 +100,21 @@ $(document).ready(function(){
 		}
 		if(type == 'system')
 		{
-			$('#message_box').append("<div class=\"system_msg\"><i>"+umsg+"</i></div>").emotions();
+			$('#message_box').append("<div class=\"system_msg\"><i>"+umsg+"</i></div>")
   				$('#serverAudio')[0].play();
   				if ($('.myCheckbox').attr('checked','checked')){
   					meSpeak.speak(umsg)
   				}
 		}
-		if (uname == '<?php echo $_GET["un"]; ?>')
+		if(type == 'systemConnection')
+		{
+			$('#message_box').append("<div class=\"system_msg\"><i>"+umsg+"</i></div>")
+			if ($('.myCheckbox').attr('checked','checked')){
+  				meSpeak.speak(umsg)
+  			}
+		}
+
+		if (uname == '<?php echo $_GET["un"]; ?>' || type != 'systemConnection')
   			{
 		$('#message').val(''); //reset text
 		}
