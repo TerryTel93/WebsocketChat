@@ -28,10 +28,12 @@
 .user_message{color: #88B6E0;}
 -->
 </style>
+<link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+<link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
 </head>
 <script type="text/javascript" src="js/jquery.js"></script>
 <script type="text/javascript" src="mespeak.js"></script>
-
+<script type="text/javascript" src="bootstrap/js/bootstrap.js"></script>
 <body>	
 <?php 
 $colours = array('007AFF','FF7000','FF7000','15E25F','CFC700','CFC700','CF1100','CF00BE','F00');
@@ -131,9 +133,10 @@ $(document).ready(function(){
   </script>
 <div class="chat_wrapper">
 <div class="message_box" id="message_box"></div>
-<div class="panel">
-<input type="text" name="message" id="message" placeholder="Message" style="width:80%" />
-<button id="send-btn">Send</button>
+<br>
+<div class="input-append">
+  		<input type="text" class="span9" name="message" id="message" placeholder="Message"/>
+  		<button class="btn" id="send-btn" type="button">Send</button>
 </div>
 </div>
 
