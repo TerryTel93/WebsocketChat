@@ -2,32 +2,7 @@
 <html>
 <head>
 <meta charset='UTF-8' />
-<style type="text/css">
-<!--
-.chat_wrapper {
-	width: 1000px;
-	margin-right: auto;
-	margin-left: auto;
-	background: #CCCCCC;
-	border: 1px solid #999999;
-	padding: 10px;
-	font: 12px 'lucida grande',tahoma,verdana,arial,sans-serif;
-}
-.chat_wrapper .message_box {
-	background: #FFFFFF;
-	height: 600px;
-	overflow: auto;
-	padding: 10px;
-	border: 1px solid #999999;
-}
-.chat_wrapper .panel input{
-	padding: 2px 2px 2px 5px;
-}
-.system_msg{color: #BDBDBD;font-style: italic;}
-.user_name{font-weight:bold;}
-.user_message{color: #88B6E0;}
--->
-</style>
+
 <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
 <link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
 </head>
@@ -48,7 +23,7 @@ $(document).ready(function(){
 	websocket = new WebSocket(wsUri); 
 	
 	websocket.onopen = function(ev) { // connection is open 
-		$('#message_box').append("<div class=\"system_msg\">Connected!</div>"); //notify user
+		$('#message_box').append("<div class=\"alert  alert-info\">Connected!</div>"); //notify user
 			var msg = {
 	message: "/connection",
 	name: '<?php echo $_GET["un"]; ?>',
@@ -67,7 +42,7 @@ $(document).ready(function(){
 			alert("Enter Some message Please!");
 			return;
 		}
-		
+
 		//prepare json data
 		var msg = {
 		message: mymessage,
@@ -90,7 +65,7 @@ $(document).ready(function(){
 
 		if(type == 'usermsg') 
 		{
-			$('#message_box').append("<div><span class=\"user_name\" style=\"color:#"+ucolor+"\">"+uname+"</span> : <span class=\"user_message\">"+umsg+"</span></div>")
+			$('#message_box').append("<div class='alert alert-Inverse'><span class=\"user_name\" style=\"color:#"+ucolor+"\">"+uname+"</span> : <span class=\"user_message\">"+umsg+"</span></div>")
 			if (uname != '<?php echo $_GET["un"]; ?>')
   			{
   				$('#chatAudio')[0].play();
@@ -102,7 +77,7 @@ $(document).ready(function(){
 		}
 		if(type == 'system')
 		{
-			$('#message_box').append("<div class=\"system_msg\"><i>"+umsg+"</i></div>")
+			$('#message_box').append("<div class=\"alert  alert-info\"><i>"+umsg+"</i></div>")
   				$('#serverAudio')[0].play();
   				if ($('.myCheckbox').attr('checked','checked')){
   					meSpeak.speak(umsg)
@@ -110,7 +85,7 @@ $(document).ready(function(){
 		}
 		if(type == 'systemConnection')
 		{
-			$('#message_box').append("<div class=\"system_msg\"><i>"+umsg+"</i></div>")
+			$('#message_box').append("<div class=\"alert  alert-info\"><i>"+umsg+"</i></div>")
 			if ($('.myCheckbox').attr('checked','checked')){
   				meSpeak.speak(umsg)
   			}
@@ -122,8 +97,8 @@ $(document).ready(function(){
 		}
 	};
 	
-	websocket.onerror	= function(ev){$('#message_box').append("<div class=\"system_error\">Error Occurred - "+ev.data+"</div>");}; 
-	websocket.onclose 	= function(ev){$('#message_box').append("<div class=\"system_msg\">Connection Closed</div>");}; 
+	websocket.onerror	= function(ev){$('#message_box').append("<div class=\"alert  alert-danger\">Error Occurred - "+ev.data+"</div>");}; 
+	websocket.onclose 	= function(ev){$('#message_box').append("<div class=\"alert  alert-danger\">Connection Closed</div>");}; 
 });
 </script>
   <script type="text/javascript">
@@ -131,14 +106,13 @@ $(document).ready(function(){
     meSpeak.loadConfig("mespeak_config.json");
     meSpeak.loadVoice("voices/en/en-us.json");
   </script>
-<div class="chat_wrapper">
-<div class="message_box" id="message_box"></div>
-<br>
-<div class="input-append">
-  		<input type="text" class="span9" name="message" id="message" placeholder="Message"/>
-  		<button class="btn" id="send-btn" type="button">Send</button>
-</div>
-</div>
-
+	<div class="container " >
+		<div class="span10 well " id="message_box" style="height:450px; overflow:auto;"></div>
+		<br>
+		<div class="input-append span10 row">
+				<input type="text" name="message" id="message" placeholder="Message"/>
+				<button class="btn" id="send-btn" type="button">Send</button>
+		</div>
+	</div>
 </body>
 </html>
