@@ -5,7 +5,7 @@ A Chat site using PHP And JavaScript via WebSocket.
 HOW TO RUN
 
     To run the server in CMD/terminal: 
-        "PHP -q htdoc/WebsocketChat/server.php"
+        "php -q c:\path\server.php"
         
     To conenct to the website you need to type in the channel name and username: 
         index.php?un=TerryTel93&channale=main.
