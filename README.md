@@ -1,10 +1,10 @@
 WebsocketChat
 =============
-A Chat Site using PHP And JavaScript using WebSocket.
+A Chat site using PHP And JavaScript via WebSocket.
 
 HOW TO RUN
 
-    To run the server to run the server in CMD/terminal: 
+    To run the server in CMD/terminal: 
         "PHP -q htdoc/WebsocketChat/server.php"
         
     To conenct to the website you need to type in the channel name and username: 
@@ -14,7 +14,10 @@ HOW TO RUN
 
 COMMANDS
 
-    so far only two commands are added:
-        /allplayers - shows you who connect and what channal.
-        /whoami - shows you what username.
+    So far only two commands are added:
+        /allplayers - Shows you who connect and what channal.
+        /whoami - Shows you what username.
+        
+    Commands that are not really a command
+        /connection - This is a command that register your username and adds you to the channel.
 
