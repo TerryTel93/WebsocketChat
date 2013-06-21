@@ -50,24 +50,26 @@ while (true) {
 			$user_name = $tst_msg->name; //sender name
 			$user_message = $tst_msg->message; //message text
 			$user_color = $tst_msg->color; //color
-			$channel = $tst_msg->channel; //color
+			$channel = $tst_msg->channel; //channel
 			$usernames[substr((string)$changed_socket, -1)]['username'] = $user_name;
 			$usernames[substr((string)$changed_socket, -1)]['channel'] = $channel;
 			//prepare data to be sent to client
-			$received_text = emoticons($received_text)
-			$received_text = url($received_text)
+			
+			$user_message = emoticons($user_message);
+			$user_message = url($user_message);
 			$response_text = mask(json_encode(array('type'=>'usermsg', 'name'=>$user_name, 'message'=>$user_message, 'color'=>$user_color)));
 			$count = count($clients)-1;
+			
 			if ($user_message == "/allplayers")
 			{
-						$response = mask(json_encode(array('type'=>'system', 'message'=>'SERVER: '.$count.' users are connected:'.implode(',', array_map(function($usernames){ return $usernames['username'].": ".$usernames['channel']; }, $usernames)))));
-						@socket_write($changed_socket,$response,strlen($response));
+				$response = mask(json_encode(array('type'=>'system', 'message'=>'SERVER: '.$count.' users are connected:'.implode(',', array_map(function($usernames){ return $usernames['username'].": ".$usernames['channel']; }, $usernames)))));
+				@socket_write($changed_socket,$response,strlen($response));
 				break 2;
 			}
 
 			if ($user_message == "/connection")
 			{
-				$response = mask(json_encode(array('type'=>'systemConnection', 'message'=>'SERVER: '.$user_name.' connected'))); //prepare json data
+				$response = mask(json_encode(array('type'=>'systemConnection', 'message'=>'SERVER: '.$user_name.' Connected To Channel '.$channel.''))); //prepare json data
 				send_message($response,$channel);
 				break 2;
 			}
@@ -77,6 +79,14 @@ while (true) {
 				@socket_write($changed_socket,$response,strlen($response));
 				break 2;
 			}
+
+			if (substr($user_message, 0, 1) === '/') 
+			{
+   			 	$response = mask(json_encode(array('type'=>'system', 'message'=>'SERVER: Command Not Fount')));
+				@socket_write($changed_socket,$response,strlen($response));
+				break 2;
+			}
+
 			send_message($response_text,$channel); //send data
 			break 2; //exist this loop
 		}
@@ -180,23 +190,33 @@ function perform_handshaking($receved_header,$client_conn, $host, $port)
 	"Sec-WebSocket-Accept:$secAccept\r\n\r\n";
 	socket_write($client_conn,$upgrade,strlen($upgrade));
 }
-function url($str) {
-$p = '^(http(s)?|ftp)://([a-z0-9_-]+.)+([a-z]{2,}){1}((:|/)(.*))?$';
-$w = explode(" ", $str); 
-foreach($w as $s)
-{
-    if(eregi($p, $s)) 
-    {
-        $t .= '<a href="'.$s.'" target="newTab">'.$s.'</a> '; 
-    }
-    else
-    {
-        $t .= $s.' ';
-    }
 
-	}
-return $t;
+function url($text)
+{
+  return  preg_replace(
+     array(
+       '/(?(?=<a[^>]*>.+<\/a>)
+             (?:<a[^>]*>.+<\/a>)
+             |
+             ([^="\']?)((?:https?|ftp|bf2|):\/\/[^<> \n\r]+)
+         )/iex',
+       '/<a([^>]*)target="?[^"\']+"?/i',
+       '/<a([^>]+)>/i',
+       '/(^|\s)(www.[^<> \n\r]+)/iex',
+       '/(([_A-Za-z0-9-]+)(\\.[_A-Za-z0-9-]+)*@([A-Za-z0-9-]+)
+       (\\.[A-Za-z0-9-]+)*)/iex'
+       ),
+     array(
+       "stripslashes((strlen('\\2')>0?'\\1<a href=\"\\2\">\\2</a>\\3':'\\0'))",
+       '<a\\1',
+       '<a\\1 target="_blank">',
+       "stripslashes((strlen('\\2')>0?'\\1<a href=\"http://\\2\">\\2</a>\\3':'\\0'))",
+       "stripslashes((strlen('\\2')>0?'<a href=\"mailto:\\0\">\\0</a>':'\\0'))"
+       ),
+       $text
+   );
 }
+
 function youtube($url) {
 preg_match(
         '/[\\?\\&]v=([^\\?\\&]+)/',
@@ -210,36 +230,34 @@ $height = '385';
 return '<object width="' . $width . '" height="' . $height . '"><param name="movie" value="http://www.youtube.com/v/' . $id . '&amp;hl=en_US&amp;fs=1?rel=0"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/' . $id . '&amp;hl=en_US&amp;fs=1?rel=0" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="' . $width . '" height="' . $height . '"></embed></object>';
 }
 
-      function emoticons($text) {
-           $icons = array(
-						  ':)'    =>  '<img src="emotions-fb/smile.gif" class="emo1"/>',
-                          'O:)'   =>  '<img src="emotions-fb/angel.gif" class="emo1"/>',
-						  ':3'    =>  '<img src="emotions-fb/colonthree.gif" class="emo1"/>',
-                          'o.0'   =>  '<img src="emotions-fb/confused.gif" class="emo1"/>',
-						  'o.O'   =>  '<img src="emotions-fb/confused.gif" class="emo1"/>',
-						  ":')"   =>  '<img src="emotions-fb/cry.gif" class="emo1"/>',
-						  "3:)"   =>  '<img src="emotions-fb/devil.gif" class="emo1"/>',
-						  ":("    =>  '<img src="emotions-fb/frown.gif" class="emo1"/>',
-						  '8)'    =>  '<img src="emotions-fb/glasses.gif" class="emo1"/>',
-                          ':D'    =>  '<img src="emotions-fb/grin.gif" class="emo1"/>',
-						  '>:('   =>  '<img src="emotions-fb/grumpy.gif" class="emo1"/>',
-                          '<3'    =>  '<img src="emotions-fb/heart.gif" class="emo1"/>',
-						  'kiki'  =>  '<img src="emotions-fb/^_^.gif" class="emo1"/>',
-						  ":*"    =>  '<img src="emotions-fb/kiss.gif" class="emo1"/>',
-						  ":v"    =>  '<img src="emotions-fb/pacman.gif" class="emo1"/>',
-						  ":("    =>  '<img src="emotions-fb/frown.gif" class="emo1"/>',
-						  '-_-'    =>  '<img src="emotions-fb/squint.gif" class="emo1"/>',
-						  '8|'   =>  '<img src="emotions-fb/sunglasses.gif" class="emo1"/>',
-                          ':p'    =>  '<img src="emotions-fb/tongue.gif" class="emo1"/>',
-						  ':P'  =>  '<img src="emotions-fb/tongue.gif" class="emo1"/>',
-						  ":/"    =>  '<img src="emotions-fb/unsure.gif" class="emo1"/>',
-						  ">:O"    =>  '<img src="emotions-fb/upset.gif" class="emo1"/>',
-						  ";)"    =>  '<img src="emotions-fb/wink.gif" class="emo1"/>',
-						  ); 
-            $text = " ".$text." ";       
-            foreach ($icons as $search => $replace){
-             $text = str_replace(" ".$search." ", " ".$replace." ", $text);
-            }
-			echo $text;
-           return trim($text);
-      }
+function emoticons($text) {
+$remove = array('http://','https://');
+$remove1 = array('', '', '', '');
+$arrFrom = array(':)', 'O:)', ':3', 'o.0', 'o.O', ":')", '3:)', ':(', '8)', ':D', '>:(', '<3', '^_^', ':*', ':v', '-_-', '8|',':p', ':P', ':/', '>:O', ';)');
+$arrTo = array(
+			  '<img src="emotions-fb/smile.gif" class="emo1"/>',
+	          '<img src="emotions-fb/angel.gif" class="emo1"/>',
+			  '<img src="emotions-fb/colonthree.gif" class="emo1"/>',
+	          '<img src="emotions-fb/confused.gif" class="emo1"/>',
+			  '<img src="emotions-fb/confused.gif" class="emo1"/>',
+			  '<img src="emotions-fb/cry.gif" class="emo1"/>',
+			  '<img src="emotions-fb/devil.gif" class="emo1"/>',
+			  '<img src="emotions-fb/frown.gif" class="emo1"/>',
+			  '<img src="emotions-fb/glasses.gif" class="emo1"/>',
+	          '<img src="emotions-fb/grin.gif" class="emo1"/>',
+			  '<img src="emotions-fb/grumpy.gif" class="emo1"/>',
+	          '<img src="emotions-fb/heart.gif" class="emo1"/>',
+			  '<img src="emotions-fb/kiki.gif" class="emo1"/>',
+			  '<img src="emotions-fb/kiss.gif" class="emo1"/>',
+			  '<img src="emotions-fb/pacman.gif" class="emo1"/>',
+			  '<img src="emotions-fb/squint.gif" class="emo1"/>',
+			  '<img src="emotions-fb/sunglasses.gif" class="emo1"/>',
+	          '<img src="emotions-fb/tongue.gif" class="emo1"/>',
+			  '<img src="emotions-fb/tongue.gif" class="emo1"/>',
+			  '<img src="emotions-fb/unsure.gif" class="emo1"/>',
+			  '<img src="emotions-fb/upset.gif" class="emo1"/>',
+			  '<img src="emotions-fb/wink.gif" class="emo1"/>',
+			  );
+$text = str_replace($remove, $remove1, $text);
+return str_replace($arrFrom, $arrTo, $text);
+}
