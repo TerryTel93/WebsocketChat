@@ -16,7 +16,10 @@ $user_colour = array_rand($colours);
 ?>
 
 <script language="javascript" type="text/javascript">
-$(document).ready(function(){
+
+function main(){
+var wsUri = "ws://" + window.location.host + ":9000";
+	websocket = new WebSocket(wsUri); 
 	$('<audio id="chatAudio"><source src="sounds-949-you-wouldnt-believe.mp3" type="audio/mpeg"></audio><audio id="serverAudio"><source src="sounds-917-communication-channel.mp3" type="audio/mpeg"></audio>').appendTo('body');
 	//create a new WebSocket object.
 	var wsUri = "ws://" + window.location.host + ":9000";
@@ -97,8 +100,14 @@ $(document).ready(function(){
 		}
 	};
 	
-	websocket.onerror	= function(ev){$('#message_box').append("<div class=\"alert  alert-danger\">Error Occurred - "+ev.data+"</div>");}; 
-	websocket.onclose 	= function(ev){$('#message_box').append("<div class=\"alert  alert-danger\">Connection Closed</div>");}; 
+	websocket.onerror	= function(ev){$('#message_box').append("<div class=\"alert  alert-danger\">Error Occurred - "+ev.data+"<a onclick='main();' class='pull-right'>reconnect?</a></div>");}; 
+	websocket.onclose 	= function(ev){$('#message_box').append("<div class=\"alert  alert-danger\">Connection Closed<a onclick='main();' class='pull-right'>reconnect?<i class='icon-refresh '></i></a></div>");}; 
+
+}
+
+
+$(document).ready(function(){
+main();
 });
 </script>
   <script type="text/javascript">
